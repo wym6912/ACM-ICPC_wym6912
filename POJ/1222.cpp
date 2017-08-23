@@ -19,9 +19,9 @@ const double pi = 4 * atan(1.0);
 const double ee = exp(1.0);
 const int maxn = 100 + 10;
 
-int a[maxn][maxn];  //Ôö¹ã¾ØÕó
-int x[maxn];        //½â¼¯
-bool freeX[maxn];   //±ê¼Ç½âÊÇ·ñÊÇ×ÔÓÉ±äÔª
+int a[maxn][maxn];  
+int x[maxn];        
+bool freeX[maxn];   
 
 int gcd(int a, int b)
 {
@@ -33,12 +33,6 @@ int lcm(int a, int b)
     return a / gcd(a, b) * b;
 }
 
-//¸ßË¹ÏûÔª½â·½³Ì×é
-//·µ»ØÖµ-2±íÊ¾ÓÐ¸¡µãÊý½â£¬ÎÞÕûÊý½â
-//·µ»ØÖµ-1±íÊ¾ÎÞ½â£¬0±íÊ¾ÓÐÎ¨Ò»½â£¬´óÓÚ0±íÊ¾ÓÐÎÞÇî½â£¬·µ»Ø×ÔÓÉ±äÔª¸öÊý
-//ÓÐequ¸ö·½³Ì£¬var¸ö±äÔª
-//Ôö¹ã¾ØÕóÐÐÊý[0, equ - 1]
-//Ôö¹ã¾ØÕóÁÐÊý[0, var]
 int gauss(int equ, int var)
 {
     for (int i = 0; i <= var; i++)
@@ -46,16 +40,11 @@ int gauss(int equ, int var)
         x[i] = 0;
         freeX[i] = true;
     }
-    //×ª»»Îª½×ÌÝ¾ØÕó
-    //col±íÊ¾µ±Ç°ÕýÔÚ´¦ÀíµÄÕâÒ»ÁÐ
     int col = 0;
     int row = 0;
-    //maxR±íÊ¾µ±Ç°Õâ¸öÁÐÖÐÔªËØ¾ø¶ÔÖµ×î´óµÄÐÐ
     int maxRow;
     for (; row < equ && col < var; row++, col++)
     {
-        //Ã¶¾Ùµ±Ç°ÕýÔÚ´¦ÀíµÄÐÐ
-        //ÕÒµ½¸ÃcolÁÐÔªËØ¾ø¶ÔÖµ×î´óµÄÄÇÐÐÓëµÚkÐÐ½»»»
         maxRow = row;
         for (int i = row + 1; i < equ; i++)
         {
@@ -66,7 +55,7 @@ int gauss(int equ, int var)
         }
         if (maxRow != row)
         {
-            //ÓëµÚrowÐÐ½»»»
+            
             for (int j = row; j < var + 1; j++)
             {
                 swap(a[row][j], a[maxRow][j]);
@@ -74,13 +63,12 @@ int gauss(int equ, int var)
         }
         if (a[row][col] == 0)
         {
-            //ËµÃ÷¸ÃcolÁÐµÚrowÐÐÒÔÏÂÈ«ÊÇ0£¬´¦Àíµ±Ç°ÐÐµÄÏÂÒ»ÁÐ
             row--;
             continue;
         }
         for (int i = row + 1; i < equ; i++)
         {
-            //Ã¶¾ÙÒªÉ¾µÄÐÐ
+            
             if (a[i][col] != 0)
             {
                 for (int j = col; j < var + 1; j++)
@@ -105,9 +93,6 @@ int gauss(int equ, int var)
 
 int main()
 {
-#ifdef LOCAL
-    freopen("in.txt", "r", stdin);
-#endif // LOCAL
     int ncase;
     int ca = 1;
     scanf("%d", &ncase);
