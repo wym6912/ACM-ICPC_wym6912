@@ -1,116 +1,80 @@
-#include <iostream>  
-#include <cstdio>  
-using namespace std;  
-const int N = 100005;  
-#define lson l,m,rt<<1  
-#define rson m+1,r,rt<<1|1  
-  
-__int64 sum[N<<2],add[N<<2];  
-struct Node  
-{  
-    int l,r;  
-    int mid()  
-    {  
-        return (l+r)>>1;  
-    }  
-} tree[N<<2];  
-  
-void PushUp(int rt)  
-{  
-    sum[rt] = sum[rt<<1] + sum[rt<<1|1];  
-}  
-  
-void PushDown(int rt,int m)  
-{  
-    if(add[rt])  
-    {  
-        add[rt<<1] += add[rt];  
-        add[rt<<1|1] += add[rt];  
-        sum[rt<<1] += add[rt] * (m - (m>>1));  
-        sum[rt<<1|1] += add[rt] * (m>>1);  
-        add[rt] = 0;  
-    }  
-}  
-  
-void build(int l,int r,int rt)  
-{  
-    tree[rt].l = l;  
-    tree[rt].r = r;  
-    add[rt] = 0;  
-    if(l == r)  
-    {  
-        scanf("%I64d",&sum[rt]);  
-        return ;  
-    }  
-    int m = tree[rt].mid();  
-    build(lson);  
-    build(rson);  
-    PushUp(rt);  
-}  
-  
-void update(int c,int l,int r,int rt)  
-{  
-    if(tree[rt].l == l && r == tree[rt].r)  
-    {  
-        add[rt] += c;  
-        sum[rt] += (__int64)c * (r-l+1);  
-        return;  
-    }  
-    if(tree[rt].l == tree[rt].r) return;  
-    PushDown(rt,tree[rt].r - tree[rt].l + 1);  
-    int m = tree[rt].mid();  
-    if(r <= m) update(c,l,r,rt<<1);  
-    else if(l > m) update(c,l,r,rt<<1|1);  
-    else  
-    {  
-        update(c,l,m,rt<<1);  
-        update(c,m+1,r,rt<<1|1);  
-    }  
-    PushUp(rt);  
-}  
-  
-__int64 query(int l,int r,int rt)  
-{  
-    if(l == tree[rt].l && r == tree[rt].r)  
-    {  
-        return sum[rt];  
-    }  
-    PushDown(rt,tree[rt].r - tree[rt].l + 1);  
-    int m = tree[rt].mid();  
-    __int64 res = 0;  
-    if(r <= m) res += query(l,r,rt<<1);  
-    else if(l > m) res += query(l,r,rt<<1|1);  
-    else  
-    {  
-       res += query(l,m,rt<<1);  
-       res += query(m+1,r,rt<<1|1);  
-    }  
-    return res;  
-}  
-  
-int main()  
-{  
-    int n,m;  
-    while(~scanf("%d %d",&n,&m))  
-    {  
-        build(1,n,1);  
-        while(m--)  
-        {  
-            char ch[2];  
-            scanf("%s",ch);  
-            int a,b,c;  
-            if(ch[0] == 'Q')  
-            {  
-                scanf("%d %d", &a,&b);  
-                printf("%I64d\n",query(a,b,1));  
-            }  
-  
-            else  
-            {  
-                scanf("%d %d %d",&a,&b,&c);  
-                update(c,a,b,1);  
-            }  
-        }  
-    }  
-    return 0;  
-}  
+#include <cstdio>
+#include <cstring>
+#include <cassert>
+
+using namespace std;
+
+typedef long long ll;
+
+const int DAT_SIZE = (1 << 18) - 1;
+const int MAX_N = 100009;
+const int MAX_Q = 100009;
+
+int Q, N;
+int A[MAX_N];
+char T[MAX_Q];
+int L[MAX_Q], R[MAX_Q], X[MAX_Q];
+
+ll data[DAT_SIZE], datb[DAT_SIZE]; //data is Main Tree, datb is tag tree
+
+inline int min(int a,int b){return a < b ? a : b;}
+inline int max(int a,int b){return a > b ? a : b;}
+
+void add(int a,int b,int x,int k,int l,int r)
+{
+	if(a <= l && r <= b)data[k] += x;
+	else if(l < b && a < r)
+	{
+		datb[k] += (min(b, r) - max(a, l)) * x;
+		add(a, b, x, k * 2 + 1, l, (l + r) >> 1);
+		add(a, b, x, k * 2 + 2, (l + r) >> 1, r);
+	}
+	//else assert();
+}
+
+ll sum(int a,int b,int k,int l,int r)
+{
+	if(b <= l || r <= a)
+		return 0;
+	else if(a <= l && r <= b)
+	{
+		return data[k] * (r - l) + datb[k];
+	}
+	else 
+	{
+		ll res = (min(b, r) - max(a, l)) * data[k];
+		res += sum(a, b, k * 2 + 1, l, (l + r) >> 1);
+		res += sum(a, b, k * 2 + 2, (l + r) >> 1, r);
+		return res;
+	}
+}
+
+void solve()
+{
+	for(int i = 0;i < N;i ++)
+		add(i,i + 1, A[i], 0, 0, N);
+	for(int i = 0;i < Q;i ++)
+		if(T[i] == 'C')
+			add(L[i] - 1, R[i], X[i], 0, 0, N);
+		else
+			printf("%lld\n", sum(L[i] - 1, R[i], 0, 0, N));
+}
+
+int main()
+{
+	while(~ scanf("%d%d",&N,&Q))
+	{
+		memset(data,0,sizeof(data));
+		memset(datb,0,sizeof(datb));
+		for(int i = 0;i < N;i ++)
+			scanf("%lld",&A[i]);
+		for(int i = 0;i < Q;i ++)
+		{
+			scanf("\n%c",&T[i]);
+			if(T[i] == 'C')scanf("%d%d%lld",&L[i],&R[i],&X[i]);
+			else scanf("%d%d",&L[i],&R[i]);
+		}
+		solve();
+	}
+	return 0;
+}
