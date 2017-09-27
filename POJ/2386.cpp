@@ -1,10 +1,30 @@
+#define NOSTDCPP
+#ifndef NOSTDCPP
+
 #include <bits/stdc++.h>
+
+#else
+
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <iostream>
+#include <algorithm>
+#include <map>
+#include <set>
+#include <vector>
+#include <string>
+#include <queue>
+#include <stack>
+#include <cassert>
+
+#endif
 
 using namespace std;
 
 int movex[9]={0,-1, 0, 1,-1, 1,-1, 0, 1};
 int movey[9]={0,-1,-1,-1, 0, 0, 1, 1, 1};
-int map0[101][101];
+int map0[109][109];
 int n,m;
 //vector < vector<int> > map0;
 	
@@ -13,7 +33,7 @@ void bfs(int x,int y)
 	queue <int> qx,qy;
 	qx.push(x);
 	qy.push(y);
-	while(!qx.empty())
+	while(!qx.empty()&&!qy.empty())
 	{
 		x=qx.front();
 		y=qy.front();
@@ -28,7 +48,7 @@ void bfs(int x,int y)
 		qy.pop();
 	}
 	return ;
-}*/
+}
 
 void dfs(int x,int y)
 {
@@ -51,18 +71,19 @@ void dfs(int x,int y)
 
 int main()
 {
-	
+	while(~ scanf("%d %d",&n,&m))
+	{
 	char x;
 	int sum=0;
-	scanf("%d %d",&n,&m);
 	for(int i=1;i<=n;i++)
 	{
-		if(i!=1)getchar();
+		getchar();
 		for(int j=1;j<=m;j++)
 			{
 				scanf("%c",&x);
 				if(x=='W')map0[i][j]=1;
-				if(x=='.')map0[i][j]=0;
+				else if(x=='.')map0[i][j]=0;
+				else assert(false);
 			}
 		}
 	for(int i=1;i<=n;i++)
@@ -71,8 +92,10 @@ int main()
 			{
 				bfs(i,j);
 				//dfs(i,j);
-				sum++;
+				sum ++;
 			}	
-	printf("%d",sum);
+	printf("%d\n",sum);
+	getchar();
+	}
 	return 0;
 }
