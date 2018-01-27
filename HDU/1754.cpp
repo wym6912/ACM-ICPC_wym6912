@@ -1,103 +1,131 @@
+//#define NOSTDCPP
+#ifndef NOSTDCPP
+
 #include <bits/stdc++.h>
 
-#define TREE_SIZE (1 << (20))
+#else
+
+#include <algorithm>
+#include <bitset>
+#include <cassert>
+#include <complex>
+#include <cstring>
+#include <cstdio>
+#include <deque>
+#include <exception>
+#include <fstream>
+#include <functional>
+#include <iomanip>
+#include <iostream>
+#include <istream>
+#include <iterator>
+#include <list>
+#include <map>
+#include <ostream>
+#include <queue>
+#include <set>
+#include <sstream>
+#include <stack>
+#include <string>
+#include <typeinfo>
+#include <utility>
+#include <valarray>
+#include <vector>
+
+#endif
+
+# define RESET(_) memset(_, 0, sizeof(_))
+# define RESET_(_, val) memset(_, val, sizeof(_))
+# define fi first
+# define se second
+# define pb push_back
+# define midf(x, y) ((x + y) >> 1)
+# define DXA(_) ((_ << 1))
+# define DXB(_) ((_ << 1) | 1)
 
 using namespace std;
 
-class IntervalTree
+typedef long long ll;
+typedef vector <int> vi;
+typedef set <int> si;
+typedef long double ld;
+
+const int MOD = 1e9 + 7;
+const int maxn = 200000 * 4;
+const int maxm = -(1 << 30);
+const double pi = acos(-1.0);
+const double eps = 1e-6;
+
+typedef struct node
 {
-	private:
-		int Cover[TREE_SIZE],Top[TREE_SIZE];
-		int size;
-		int __QueryMax__(int a,int b,int l,int r,int Ind)
-		{
-			if(a <= l && b >= r)
-				return Top[Ind];
-			int mid = (l + r) >> 1,ret = Cover[Ind];
-			if(a <= mid)ret = max(ret,__QueryMax__(a,b,l,mid,Ind << 1));
-			if(b > mid)ret = max(ret,__QueryMax__(a,b,mid + 1,r,(Ind << 1) + 1));
-			return ret;
-		}
-		void __ModifyMax__(int a,int l,int r,int Ind,int d)
-		{
-			if(l == r && l == a)
-			{
-				Cover[Ind] = Top[Ind] = d;
-				return ;
-			}
-			int mid = (l + r) >> 1;
-			if(a <= mid)__ModifyMax__(a,l,mid,Ind << 1,d);
-			else __ModifyMax__(a,mid + 1,r,(Ind << 1) + 1,d);
-			Top[Ind] = max(Top[Ind << 1],Top[(Ind << 1) + 1]);
-		}
-		int __QueryMin__(int a,int b,int l,int r,int Ind)
-		{
-			if(a <= l && b >= r)
-				return Top[Ind];
-			int mid = (l + r) >> 1,ret = Cover[Ind];
-			if(a <= mid)ret = min(ret,__QueryMin__(a,b,l,mid,Ind << 1));
-			if(b > mid)ret = min(ret,__QueryMin__(a,b,mid + 1,r,(Ind << 1) + 1));
-			return ret;
-		}
-		void __ModifyMin__(int a,int l,int r,int Ind,int d)
-		{
-			if(l == r && l == a)
-			{
-				Cover[Ind] = Top[Ind] = d;
-				return ;
-			}
-			int mid = (l + r) >> 1;
-			if(a <= mid)__ModifyMin__(a,l,mid,Ind << 1,d);
-			else __ModifyMin__(a,mid + 1,r,(Ind << 1) + 1,d);
-			Top[Ind] = min(Top[Ind << 1],Top[(Ind << 1) + 1]);
-		}
-		void __ResetData__()
-		{
-			memset(Cover,0,sizeof(Cover));
-			memset(Top,0,sizeof(Top));
-		}
-		public:
-			IntervalTree()
-			{
-				__ResetData__();
-				size = (TREE_SIZE << 2) - 1;
-			}
-			IntervalTree(int size):size(size)
-			{
-				__ResetData__();
-			}
-			int Query(int a,int b)
-			{
-				return __QueryMax__(a,b,1,size,1);
-			}
-			void Modify(int a,int d)
-			{
-				return __ModifyMax__(a,1,size,1,d);
-			}
-			void reset(const int a)
-			{
-				size = a;
-				__ResetData__();
-			}
-}tree;
+	int l, r;
+	int max_stu;
+}node;
+
+node tree[maxn];
+
+void pushup(int p)
+{
+	tree[p].max_stu = max(tree[DXA(p)].max_stu, tree[DXB(p)].max_stu);
+}
+
+void pre(int l, int r, int p)
+{
+	tree[p].l = l;
+	tree[p].r = r;
+	if(l == r){scanf("%d", &tree[p].max_stu);return ;}
+	else
+	{
+		int mid = midf(l, r);
+		pre(l, mid, DXA(p));
+		pre(mid + 1, r, DXB(p));
+		pushup(p);
+	}
+}
+
+int query(int l, int r, int nl, int nr, int p)
+{
+	if(l <= nl && nr <= r)return tree[p].max_stu;
+	else 
+	{
+		int ans = maxm;
+		int mid = midf(nl, nr);
+		if(l <= mid)
+			ans = max(ans, query(l, r, nl, mid, DXA(p)));
+		if(mid < r)
+			ans = max(ans, query(l, r, mid + 1, nr, DXB(p)));
+		return ans;
+	}
+}
+
+void update(int nl, int nr, int px, int ans, int p)
+{
+	if(nl == px && nr == px)
+	{
+		tree[p].max_stu = ans;
+		return ;
+	}
+	else 
+	{
+		int mid = midf(nl, nr);
+		if(nl <= px && px <= mid)update(nl, mid, px, ans, DXA(p));
+		if(mid < px && px <= nr) update(mid + 1, nr, px, ans, DXB(p));
+		pushup(p);
+	}
+}
 
 int main()
 {
-	int n,m,tmp,a,b;
+	int n, m, tmp, a, b;
 	char x;
-	while(~ scanf("%d %d",&n,&m))
+	while(~ scanf("%d %d", &n, &m))
 	{
-		tree.reset(n);
-		for(int i = 1;i <= n;i ++)
-		{
-			scanf("%d",&tmp);
-			tree.Modify(i,tmp);
-		}
+		pre(1, n, 1);
 		for(int i = 1;i <= m;i ++)
 		{
-			scanf("\n%c %d %d",&x,&a,&b);
-			if(x == 'Q')printf("%d\n",tree.Query(a,b));
-			if(x == 'U')tree.Modify(a,b);
+			scanf("\n%c %d %d", &x, &a, &b);
+			if(x == 'Q')printf("%d\n", query(a, b, 1, n, 1));
+			if(x == 'U')update(1, n, a, b, 1);
 		}
 	}
 	return 0;
