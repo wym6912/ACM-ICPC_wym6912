@@ -1,61 +1,172 @@
-#include <iostream> 
-#include <cstdio> 
-#include <cstring> 
+//#define NOSTDCPP
+#ifndef NOSTDCPP
+
+#include <bits/stdc++.h>
+
+#else
+
+#include <algorithm>
+#include <bitset>
 #include <cassert>
+#include <complex>
+#include <cstring>
+#include <cstdio>
+#include <deque>
+#include <exception>
+#include <fstream>
+#include <functional>
+#include <iomanip>
+#include <iostream>
+#include <istream>
+#include <iterator>
+#include <list>
+#include <map>
+#include <ostream>
+#include <queue>
+#include <set>
+#include <sstream>
+#include <stack>
+#include <string>
+#include <typeinfo>
+#include <utility>
+#include <valarray>
+#include <vector>
 
-using namespace std; 
+#endif
 
-typedef long long ll; 
-const int maxn = 100005;  
-  
-int sum[maxn << 2];//求区间和   
-int lazy[maxn << 2];//延迟标记   
-  
-void pushdown(int rt, int m) {  
-    if(lazy[rt]) {//如果之前这里做了标记，则说明没有往下更新，暂停了一下，用来判断是否需要往下更新   
-        lazy[rt << 1] = lazy[rt << 1 | 1] = lazy[rt];  
-        sum[rt << 1] = (m - (m >> 1)) * lazy[rt];  
-        sum[rt << 1 | 1] = (m >> 1) * lazy[rt];  
-        lazy[rt] = 0;//往下更新完后，标记置为0，即当前不需要往下更新   
-    }  
-}  
-  
-void build(int l, int r, int rt) {  
-    lazy[rt] = 0;  
-    sum[rt] = r - l + 1;  
-    if(l == r) return;  
-    int mid = (l + r) >> 1;  
-    build(l, mid, rt << 1);  
-    build(mid + 1, r, rt << 1 | 1);  
-}  
-  
-void update(int L, int R, int c, int l, int r, int rt) {  
-    if(L <= l && r <= R) {  
-        sum[rt] = c * (r - l + 1);  
-        lazy[rt] = c;//延迟标记，每次把该段更新完后暂时不往下更新，节省时间，这里特别注意和累加的区别，累加是为整个区间增加多少值   
-        return;  
-    }  
-    pushdown(rt, r - l + 1);//向下更新   
-    int mid = (l + r) >> 1;  
-    if(L <= mid) update(L, R, c, l, mid, rt << 1);  
-    if(R >= mid + 1) update(L, R, c, mid + 1, r, rt << 1 | 1);  
-    sum[rt] = sum[rt << 1] + sum[rt << 1 | 1];//向上更新   
-}  
-  
+# define RESET(_) memset(_, 0, sizeof(_))
+# define RESET_(_, val) memset(_, val, sizeof(_))
+# define fi first
+# define se second
+# define pb push_back
+# define midf(x, y) ((x + y) >> 1)
+# define DXA(_) ((_ << 1))
+# define DXB(_) ((_ << 1) | 1)
+
+using namespace std;
+
+typedef long long ll;
+typedef vector <int> vi;
+typedef set <int> si;
+typedef long double ld;
+
+const int MOD = 1e9 + 7;
+const int maxn = 100000 * 4;
+const int maxm = 300009;
+const double pi = acos(-1.0);
+const double eps = 1e-6;
+
+typedef struct 
+{
+	int lazy, data;
+}node;
+
+node tree[maxn];
+
+template <class T>
+inline bool scan_d(T & ret)
+{
+	char c;
+	int sgn;
+	if(c = getchar(), c == EOF)return false;
+	while(c != '-' && (c < '0' || c > '9'))c = getchar();
+	sgn = (c == '-') ? -1 : 1;
+	ret = (c == '-') ? 0 : (c - '0');
+	while(c = getchar(), c >= '0' && c <= '9')
+		ret = ret * 10 + (c - '0');
+	ret *= sgn;
+	return true;
+}
+
+inline bool scan_ch(char &ch)
+{
+	if(ch = getchar(), ch == EOF)return false;
+	while(ch == ' ' || ch == '\n')ch = getchar();
+	return true;
+}
+
+inline void out_number(ll x)
+{
+	if(x < 0)
+	{
+		putchar('-');
+		out_number(- x);
+		return ;
+	}
+	if(x > 9)out_number(x / 10);
+	putchar(x % 10 + '0');
+}
+
+void pushup(int p, int l, int r)
+{
+	tree[p].data = 0;
+	if(r > l)tree[p].data = tree[DXA(p)].data + tree[DXB(p)].data;
+	//tree[p].data += tree[p].lazy * (r - l + 1);
+}
+
+void pushdown(int p, int l)
+{
+	if(tree[p].lazy)
+	{
+		tree[DXA(p)].lazy = tree[DXB(p)].lazy = tree[p].lazy, 
+		tree[DXA(p)].data = (l - (l >> 1)) * tree[p].lazy;  
+        tree[DXB(p)].data = (l >> 1) * tree[p].lazy;  
+		tree[p].lazy = 0;
+	}
+}
+
+void update(int l, int r, int nl, int nr, int d, int p)
+{
+	if(l <= nl && nr <= r)
+	{
+		tree[p].lazy = d;
+		tree[p].data = tree[p].lazy * (nr - nl + 1);
+		return ;
+	}
+	else 
+	{
+		pushdown(p, nr - nl + 1);
+		int mid = midf(nl, nr);
+		if(l <= mid)update(l, r, nl, mid, d, DXA(p));
+		if(mid < r)update(l, r, mid + 1, nr, d, DXB(p));
+	}
+	pushup(p, nl, nr);
+}
+
+int query(int l, int r, int nl, int nr, int p)
+{
+	if(tree[p].lazy)
+		return tree[p].lazy * (min(nr, r) - max(nl, l) + 1);
+	else if(l <= nl && nr <= r)
+		return tree[p].data;
+	else
+	{
+		int mid = midf(nl, nr);
+		int ans = 0;
+		if(l <= mid)ans += query(l, r, nl, mid, DXA(p));
+		if(mid < r) ans += query(l, r, mid + 1, nr, DXB(p));
+		return ans;
+	}
+}
+
 int main() {  
-    int T, n, m;  
-    scanf("%d", &T);  
-    for(int cas = 1; cas <= T; cas ++) {  
-        scanf("%d %d", &n, &m);  
-        build(1, n, 1);  
-          
-        for(int i = 0; i < m; i ++) {  
-            int a, b, c;  
-            scanf("%d %d %d", &a, &b, &c);  
-            update(a, b, c, 1, n, 1);  
+    int T, n, m, a, b, c;  
+    int ans = 0;
+    scan_d(T);
+    for(int Casen = 1; Casen <= T; Casen ++) {  
+        scan_d(n);
+		scan_d(m);
+        RESET(tree);
+        update(1, n, 1, n, 1, 1);
+        while(m --)
+		{ 
+			scan_d(a);
+			scan_d(b);
+			scan_d(c);
+            update(a, b, 1, n, c, 1);
         }  
-          
-        printf("Case %d: The total value of the hook is %d.\n", cas, sum[1]);  
+        printf("Case %d: The total value of the hook is %d.\n",
+			    Casen, query(1, n, 1, n, 1));  
     }  
     return 0;  
 }  
