@@ -1,125 +1,247 @@
-#include<cstdio>
-#include<cstring>
-#include<cstdlib>
-#include<set>
-#include<queue>
-#include<iostream>
-#include<algorithm>
-using namespace std;
-typedef long long LL;
-#define inf 0x3f3f3f
-#define MAXN 100100
+#define NOSTDCPP
+#ifndef NOSTDCPP
 
-struct tree
+#include <bits/stdc++.h>
+
+#else
+
+#include <algorithm>
+#include <bitset>
+#include <cassert>
+#include <complex>
+#include <cstring>
+#include <cstdio>
+#include <deque>
+#include <exception>
+#include <fstream>
+#include <functional>
+#include <iomanip>
+#include <iostream>
+#include <istream>
+#include <iterator>
+#include <list>
+#include <map>
+#include <ostream>
+#include <queue>
+#include <set>
+#include <sstream>
+#include <stack>
+#include <string>
+#include <typeinfo>
+#include <utility>
+#include <valarray>
+#include <vector>
+
+#endif
+
+# define RESET(_) memset(_, 0, sizeof(_))
+# define RESET_(_, val) memset(_, val, sizeof(_))
+# define fi first
+# define se second
+# define pb push_back
+# define midf(x, y) ((x + y) >> 1)
+# define DXA(_) ((_ << 1))
+# define DXB(_) ((_ << 1) | 1)
+
+using namespace std;
+
+typedef long long ll;
+typedef vector <int> vi;
+typedef set <int> si;
+typedef long double ld;
+
+const int MOD = 1e9 + 7;
+const int maxn = 100000 * 4;
+const int maxm = 300009;
+const double pi = acos(-1.0);
+const double eps = 1e-6;
+
+ll myrand(ll mod){return ((ll)rand() << 32 ^ (ll)rand() << 16 ^ rand()) % mod;}
+
+template <class T>
+inline bool scan_d(T & ret)
 {
-    int l;
-    int r;
-    int colr;
-    bool lazy;//lazy是lazy-tag
-};
-tree t[MAXN*4];
-int L,T,O;
-int cc;
-int x,y,c;
-void Swap()
-{
-    int temp=x;
-    x=y;
-    y=temp;
+	char c;
+	int sgn;
+	if(c = getchar(), c == EOF)return false;
+	while(c != '-' && (c < '0' || c > '9'))c = getchar();
+	sgn = (c == '-') ? -1 : 1;
+	ret = (c == '-') ? 0 : (c - '0');
+	while(c = getchar(), c >= '0' && c <= '9')
+		ret = ret * 10 + (c - '0');
+	ret *= sgn;
+	return true;
 }
-void Build(int l,int r,int index)
+
+inline bool scan_ch(char &ch)
 {
-    t[index].l=l;
-    t[index].r=r;
-    t[index].colr=1;
-    t[index].lazy=0;//lazy=0，说明当前结点没有lazy标记。
-    if(l==r)
-        return;
-    int mid=(l+r)>>1;
-    Build(l,mid,index<<1);
-    Build(mid+1,r,index<<1|1);
+	if(ch = getchar(), ch == EOF)return false;
+	while(ch == ' ' || ch == '\n')ch = getchar();
+	return true;
 }
-void inse(int l,int r,int index,int cl)
+
+inline void out_number(ll x)
 {
-    if(t[index].l==l && t[index].r==r)
-    {
-        t[index].colr=(1<<(cl-1));
-        t[index].lazy=1;//更新到相应节点的时候，加上lazy-tag
-        return;
-    }
-    if(t[index].lazy) //如果当前的节点有lazy标记，则
-    {
-        t[index].lazy=0;//1，需要取消lazy标记，
-        t[index<<1].lazy=1;//2，往子节点传递lazy标记
-        t[index<<1|1].lazy=1;
-        t[index<<1].colr=t[index].colr;//3，并传递值
-        t[index<<1|1].colr=t[index].colr;
-    }
-    int mid=(t[index].l+t[index].r)>>1;
-    if(r<=mid)
-        inse(l,r,index<<1,cl);
-    else if(l>mid)
-        inse(l,r,index<<1|1,cl);
-    else
-    {
-        inse(l,mid,index<<1,cl);
-        inse(mid+1,r,index<<1|1,cl);
-    }
-    t[index].colr=t[index<<1].colr | t[index<<1|1].colr;//往上更新值。
+	if(x < 0)
+	{
+		putchar('-');
+		out_number(- x);
+		return ;
+	}
+	if(x > 9)out_number(x / 10);
+	putchar(x % 10 + '0');
 }
-void quer(int l,int r,int index)
+
+typedef struct
 {
-    //如果遇见带lazy标记的节点，只需要返回当前的节点的值就行了，
-    if(t[index].lazy || (t[index].l==l && t[index].r==r) )
-    {
-        cc|=t[index].colr;
-        return;
-    }
-    int mid=(t[index].l+t[index].r)>>1;
-    if(r<=mid)
-        quer(l,r,index<<1);
-    else if(l>mid)
-        quer(l,r,index<<1|1);
-    else
-    {
-        quer(l,mid,index<<1);
-        quer(mid+1,r,index<<1|1);
-    }
+	ll lazy;
+	ll data;
+}tree;
+
+tree node[maxn];
+
+int n, s, q;
+ll cc;
+
+void pushup(int p)
+{
+	node[p].data = node[DXA(p)].data | node[DXB(p)].data;
+	if(node[p].lazy)
+		node[p].data |= (1 << node[p].lazy);
 }
+
+void pushdown(int p)
+{
+	if(node[p].lazy) //注意有可能没打标记 
+	{
+		node[DXA(p)].lazy = node[DXB(p)].lazy = node[p].lazy;
+		node[DXA(p)].data = node[DXB(p)].data = (1 << node[p].lazy);
+		node[p].lazy = 0;
+	}
+}
+
+void pre(int l, int r, int p)
+{
+	if(l == r)
+	{
+		node[p].lazy = 1;
+		node[p].data = 1 << 1;
+		return ;
+	}
+	int mid = midf(l, r);
+	pre(l, mid, DXA(p));
+	pre(mid + 1, r, DXB(p));
+	pushup(p);
+}
+
+void update(int l, int r, int nl, int nr, ll c, int p)
+{
+	if(l <= nl && nr <= r)
+	{
+		node[p].lazy = c;
+		node[p].data = (1 << c);
+		return ;
+	}
+	else 
+	{
+		pushdown(p);
+		int mid = midf(nl, nr);
+		if(l <= mid)
+			update(l, r, nl, mid, c, DXA(p));
+		if(mid < r)
+			update(l, r, mid + 1, nr, c, DXB(p));
+	}
+	pushup(p);
+}
+
+void query(int l, int r, int nl, int nr, int p)
+{
+	if(l <= nl && nr <= r)
+	{
+		cc = cc | node[p].data;
+		return;
+	}
+	else
+	{
+		pushdown(p);
+		int mid = midf(nl, nr);
+		if(l <= mid)
+			query(l, r, nl, mid, DXA(p));
+		if(mid < r)
+			query(l, r, mid + 1, nr, DXB(p));
+	}
+}
+
 int main()
 {
-    while(scanf("%d%d%d",&L,&T,&O)!=EOF)
+	char ch;
+	int x, y, c;
+    while(scan_d(n) && scan_d(s) && scan_d(q))
     {
-        char ss;
-        Build(1,L,1);
-        while(O--)
+        pre(1, n, 1);
+        while(q --)
         {
-
-            scanf(" %c",&ss);
-            if(ss=='C')
+        	scan_ch(ch);
+        	assert(ch == 'C' || ch == 'P');
+            if(ch == 'C')
             {
-                scanf("%d%d%d",&x,&y,&c);
-                if(x>y)
-                    Swap();
-                inse(x,y,1,c);
+                scan_d(x);
+                scan_d(y);
+                scan_d(c);
+                if(x > y)
+					swap(x, y);
+                update(x, y, 1, n, c, 1);
             }
             else
             {
-                int ans=0;
-                scanf("%d%d",&x,&y);
-                if(x>y)
-                    Swap();
-
-                cc=0;
-                quer(x,y,1);
-                for(int i=0; i<T; i++)
+                int ans = 0;
+                scan_d(x);
+                scan_d(y);
+                if(x > y)
+					swap(x, y);
+                cc = 0;
+                query(x, y, 1, n, 1);
+                for(int i = 1; i <= s; i ++)
                 {
-                    if(cc&(1<<i))
-                        ans++;
+                    if(cc & (1 << i))
+                        ans ++;
                 }
-                printf("%d\n",ans);
+                out_number(ans);
+                puts("");
             }
         }
     }
     return 0;
 }
+/*
+2 2 4
+C 1 1 2
+P 1 2
+C 2 2 2
+P 1 2
+
+10 4 5
+C 2 1 3
+C 9 10 2
+C 5 5 4
+P 1 5
+P 2 2
+
+12 5 10
+C 3 2 4
+C 5 4 2
+P 6 5
+C 1 2 2
+C 2 3 2
+C 4 4 1
+P 2 3
+P 7 7
+C 8 12 5
+P 1 12
+
+6 7 4
+C 1 6 2
+P 1 5
+C 4 2 7
+P 6 1
+*/
