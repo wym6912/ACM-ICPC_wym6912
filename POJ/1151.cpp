@@ -1,4 +1,37 @@
+#define NOSTDCPP
+#ifndef NOSTDCPP
+
 #include <bits/stdc++.h>
+
+#else
+
+#include <algorithm>
+#include <bitset>
+#include <complex>
+#include <cstring>
+#include <cstdio>
+#include <deque>
+#include <exception>
+#include <fstream>
+#include <functional>
+#include <iomanip>
+#include <iostream>
+#include <istream>
+#include <iterator>
+#include <list>
+#include <map>
+#include <ostream>
+#include <queue>
+#include <set>
+#include <sstream>
+#include <stack>
+#include <string>
+#include <typeinfo>
+#include <utility>
+#include <valarray>
+#include <vector>
+
+#endif
 
 using namespace std;
 
@@ -65,4 +98,3 @@ int main()
 	}
 	return 0;
 }
-
