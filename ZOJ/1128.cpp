@@ -61,7 +61,7 @@ int main()
 		memset(xy,0,sizeof(xy));
 		solve();
 		cout << "Test case #" << xx << endl << "Total explored area: ";
-		printf("%.2lf\n",calcu());
+		printf("%.2lf\n\n",calcu());
 	}
 	return 0;
 }
