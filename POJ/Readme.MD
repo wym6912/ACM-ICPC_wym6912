@@ -1,3 +1,2 @@
 ## Link of POJ
-   poj.org
-(Peking University OJ)
+![Peking University OJ](poj.org)
