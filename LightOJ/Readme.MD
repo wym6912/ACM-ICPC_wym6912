@@ -1,2 +1,2 @@
 ## Link of LightOJ
-[Jan's LightOJ](www.lightoj.com)
+[Jan's LightOJ](http://www.lightoj.com)

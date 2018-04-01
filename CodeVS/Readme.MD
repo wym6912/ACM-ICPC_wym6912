@@ -1,2 +1,2 @@
 ## Link of CodeVS
-[CodeVS(It may change)](codevs.cn)
+[CodeVS(It may change)](http://codevs.cn)
