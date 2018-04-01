@@ -1,4 +1,4 @@
 ## Link of USACO
-   http://train.usaco.org/usacogate
-(USACO Training OJ)
+[USACO Training OJ](http://train.usaco.org/usacogate)
+## Notice
 Input & Output using **Files**

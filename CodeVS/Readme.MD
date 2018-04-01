@@ -1,3 +1,2 @@
 ## Link of CodeVS
-   codevs.cn
-(It may change)
+[CodeVS(It may change)](codevs.cn)

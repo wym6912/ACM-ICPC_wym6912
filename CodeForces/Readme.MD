@@ -1,2 +1,2 @@
-## Link of Codeforces
-   codeforces.com
+## Link of CodeForces
+   [CodeForces](codeforces.com)

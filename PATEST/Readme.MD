@@ -1,2 +1,2 @@
 ## Link of GPLT
-![gplt](https://www.patest.cn/contests/gplt)
+[gplt](https://www.patest.cn/contests/gplt)

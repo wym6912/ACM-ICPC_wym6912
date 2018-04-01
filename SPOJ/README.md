@@ -1,2 +1,2 @@
 ## Link of SPOJ
-http://www.spoj.com/
+[SPOJ](http://www.spoj.com/)

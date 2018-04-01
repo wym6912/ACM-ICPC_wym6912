@@ -1,3 +1,2 @@
 ## Link of HYSBZ
-   http://www.lydsy.com/JudgeOnline/
-(BigZone OJ)
+[BZOJ](http://www.lydsy.com/JudgeOnline/)
