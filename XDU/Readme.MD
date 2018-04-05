@@ -1,2 +1,2 @@
 ## Link of XDU
-[Xidian University OJ](acm.xidian.edu.cn)
+[Xidian University OJ](http://acm.xidian.edu.cn)
