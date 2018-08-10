@@ -126,7 +126,7 @@ ll x[maxn];
 void discrete()
 {
 	x[0] = 0;
-	sort(seq + 1, seq + seq[0]); //注意范围 
+	sort(seq + 1, seq + seq[0] + 1); //注意范围 
 	for(int i = 1; i <= seq[0]; i ++) //离散化都能写错 
 		if(i == 1|| seq[i] != seq[i - 1])
 			x[++ x[0]] = seq[i];
@@ -171,17 +171,21 @@ int main()
 		for(i = 1; i <= n; i ++)
 		{
 			if(query[i].con)
+			{
 				merge(qp(query[i].f), qp(query[i].t));
+			}
 		}
 		bool flag = true;
 		for(i = 1; i <= n; i ++)
 		{
 			if(! query[i].con)
+			{
 				if(find(qp(query[i].f)) == find(qp(query[i].t)))
 				{
 					flag = false;
 					break;
 				}
+			}
 		}
 		flag ? puts("YES") : puts("NO");
 	}
