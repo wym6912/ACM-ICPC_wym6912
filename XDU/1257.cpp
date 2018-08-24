@@ -99,7 +99,8 @@ inline void out_number(ll x)
 	putchar(x % 10 + '0');
 }
 
-pair <ll, ll> ppp[maxn];
+ll ppp[maxn][2];
+ll data[50];
 int n;
 
 int main()
@@ -108,25 +109,43 @@ int main()
 	cin.tie(0);
 	cout.tie(0);
 	int T;
-	ll minsum, maxsum, minp, maxp;
+	ll tmp;
 	scan_d(T);
 	while(T --)
 	{
 		scan_d(n);
 		for(int i = 1; i <= n; i ++)
-			scan_d(ppp[i].fi, ppp[i].se);
-		//sort(ppp + 1, ppp + 1 + n);
+			scan_d(ppp[i][0], ppp[i][1]);
 		if(n == 1){out_number(0);puts("");continue;}
-		maxsum = minsum = ppp[1].fi + ppp[1].se;
-		maxp = minp = ppp[1].fi - ppp[1].se;
-		for(int i = 2; i <= n; i ++)
+		for(int i = 0; i < (1 << 2); ++ i)
+			data[i] = -1e11;
+		for(int i = 1; i <= n; i ++)
 		{
-			minsum = min(ppp[i].fi + ppp[i].se, minsum);
-			maxsum = max(ppp[i].fi + ppp[i].se, maxsum);
-			minp = min(minp, ppp[i].fi - ppp[i].se);
-			maxp = max(maxp, ppp[i].fi - ppp[i].se);
+			for(int status = 0; status < (1 << 2); ++ status)
+			{
+				tmp = 0;
+				for(int j = 0; j < 2; j ++)
+				{
+					if(status & (1 << j))
+					{
+						tmp += ppp[i][j];
+					}
+					else tmp -= ppp[i][j];
+				}
+				data[status] = max(data[status], tmp);
+			}
 		}
-		out_number(max(maxp - minp, maxsum - minsum));
+		/*
+		for(int i = 0; i < (1 << 2); i ++)
+			cout << data[i] << ' ';
+		cout << endl;
+		*/
+		ll ans = 0;
+		for(int status1 = 0; status1 < (1 << 2); ++ status1)
+			for(int status2 = 0; status2 < (1 << 2); ++ status2)
+				if(status1 + status2 == (1 << 2) - 1)
+					ans = max(ans, data[status1] + data[status2]);
+		out_number(ans);
 		puts("");
 	}
 	return 0;
