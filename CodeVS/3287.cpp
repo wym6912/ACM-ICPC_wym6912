@@ -116,6 +116,7 @@ void init()
     RESET_(head, -1);
     pos = 1;
     RESET_(son, -1);
+    RESET_(deep, -1);
 }
 	
 void addedge(int u,int v)
@@ -229,7 +230,7 @@ void Krusual()
 			addedge(edg_1[i].t, edg_1[i].f);
 			s --;
 		}
-		if(! s) break;
+		//if(! s) break;
 	}
 }
 	
@@ -249,7 +250,13 @@ int main()
 	sort(edg_1 + 1, edg_1 + 1 + m);
 	Krusual();
 	dfs1(1, 0, 0);
+	for(int i = 1; i <= n; i ++)
+		if(deep[i] == -1)
+			dfs1(i, 0, 0);
 	getpos(1, 1);
+	for(int i = 1; i <= n; i ++)
+		if(p[i] == 0) 
+			getpos(i, i);
 	for(int i = 1; i <= m; i ++)
 		if(edg_1[i].s)
 		{
