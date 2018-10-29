@@ -173,7 +173,7 @@ int main()
 			l = j, r = min(j + k, n), val = A[i];
 			ans += query(1, n, root[l], root[r]);
 		}
-		printf("%lld ", ans);
+		printf("%I64d ", ans);
 	}
 	puts("");
 	return 0;
